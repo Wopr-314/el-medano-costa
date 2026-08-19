@@ -1,0 +1,55 @@
+name: Predicción horaria
+
+# Cada hora en punto. GitHub puede retrasar la ejecución unos minutos cuando hay
+# mucha carga; para una ventana de 3 h es irrelevante.
+on:
+  schedule:
+    - cron: "5 * * * *"
+  workflow_dispatch:        # permite lanzarla a mano desde la pestaña Actions
+
+# Necesario para que la Action pueda escribir el resultado en el repositorio.
+permissions:
+  contents: write
+
+concurrency:                # si una tarda de más, no se solapan dos
+  group: prediccion
+  cancel-in-progress: false
+
+jobs:
+  predecir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Solo lo imprescindible: NO hace falta OpenDrift ni PyTorch para predecir.
+      # La lista está en requirements.txt, que además es lo que usa la caché de
+      # setup-python: sin ese archivo, `cache: pip` falla.
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generar la predicción
+        env:
+          CMEMS_USUARIO: ${{ secrets.CMEMS_USUARIO }}
+          CMEMS_PASSWORD: ${{ secrets.CMEMS_PASSWORD }}
+        run: python 12_prediccion_web.py --modelo . --salida .
+
+      - name: Publicar si ha cambiado
+        run: |
+          git config user.name  "prediccion-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add pluma.png prediccion.json
+          # --quiet devuelve 0 si NO hay cambios: en ese caso no se hace commit
+          if git diff --cached --quiet; then
+            echo "Sin cambios que publicar."
+          else
+            git commit -m "Predicción $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git push
+          fi
