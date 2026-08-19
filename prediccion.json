@@ -1,0 +1,139 @@
+{
+  "generado_utc": "2026-08-19T20:40:14",
+  "instante_utc": "2026-08-19T20:00:00",
+  "horas": 3,
+  "modelo": "emulador_unet_osm_350m.pt",
+  "condiciones": {
+    "viento_u": -0.928,
+    "viento_v": -0.5219,
+    "corriente_u": -0.4455,
+    "corriente_v": -0.4657,
+    "corriente_u_std": 0.0616,
+    "corriente_v_std": 0.0601,
+    "ssh_media": -0.3627
+  },
+  "viento_resumen": {
+    "velocidad_ms": 1.1,
+    "desde_grados": 62
+  },
+  "fuera_de_rango": [
+    "corriente_v"
+  ],
+  "exposicion_playas": {
+    "El Médano centro": 78,
+    "El Cabezo": 34,
+    "Leocadio Machado": 100,
+    "La Tejita": 0
+  },
+  "menor_exposicion": "La Tejita",
+  "limites": {
+    "lon_min": -16.64328789225715,
+    "lat_min": 28.003551483154297,
+    "lon_max": -16.430989554723283,
+    "lat_max": 28.133190155029297
+  },
+  "precision": {
+    "desvio_centro_mediana_m": 350,
+    "desvio_centro_p90_m": 996,
+    "correlacion": 0.735,
+    "error_masa_mediana": 0.078,
+    "muestras_validacion": 75
+  },
+  "avisos": [
+    "Estimación orientativa, no una medida de contaminación.",
+    "La posición de la señal a lo largo de la costa es fiable; su extensión mar adentro se exagera (comprobado contra la simulación física).",
+    "Las analíticas municipales del Ayuntamiento de Granadilla de Abona y la bandera de la playa mandan siempre sobre cualquier salida de este modelo."
+  ],
+  "focos": [
+    {
+      "nombre": "Emisario Submarino de La Batata - Ensenada Pelada",
+      "lat": 28.05522,
+      "lon": -16.519595,
+      "estado": "En Trámite",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Central Térmica de Granadilla (I)",
+      "lat": 28.082667,
+      "lon": -16.488271,
+      "estado": "Autorizado",
+      "naturaleza": "Agua residual industrial",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Central Térmica de Granadilla (II)",
+      "lat": 28.0823,
+      "lon": -16.488775,
+      "estado": "Autorizado",
+      "naturaleza": "Refrigeración",
+      "peso": 0.2,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "EDAM Granadilla",
+      "lat": 28.08794,
+      "lon": -16.489738,
+      "estado": "Autorizado",
+      "naturaleza": "Salmuera",
+      "peso": 0.25,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Conducción de desagüe del Polígono Industrial de Granadilla",
+      "lat": 28.077049,
+      "lon": -16.485335,
+      "estado": "Autorizado",
+      "naturaleza": "Agua residual industrial",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Emisario submarino El Médano",
+      "lat": 28.041512,
+      "lon": -16.533277,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Emisario submarino Los Abrigos",
+      "lat": 28.022789,
+      "lon": -16.587679,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Aliviadero EBAR Los Abrigos",
+      "lat": 28.028261,
+      "lon": -16.593608,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 100.0
+    },
+    {
+      "nombre": "EBAR Beach I",
+      "lat": 28.051523,
+      "lon": -16.524417,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 50.0
+    },
+    {
+      "nombre": "EBAR Los Balos",
+      "lat": 28.041363,
+      "lon": -16.541001,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 150.0
+    }
+  ]
+}
