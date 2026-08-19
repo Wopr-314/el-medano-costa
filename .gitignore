@@ -1,0 +1,10 @@
+# NUNCA subir credenciales. En la Action van como secrets del repositorio.
+credenciales_locales.py
+*.env
+
+# Datos pesados y regenerables
+data/
+*.npz
+*.nc
+__pycache__/
+.ipynb_checkpoints/

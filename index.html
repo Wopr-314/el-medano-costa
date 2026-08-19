@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Médano · Costa — pluma predicha</title>
+<meta name="description" content="Estimación de dónde llegan los vertidos al mar en El Médano y La Tejita, a partir de simulación física y las condiciones de viento y corriente del momento.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0A1B26; --panel:#102838; --foam:#EDF2F0; --dim:#A9BAC0; --dim2:#7C8D93;
+    --roja:#C43E1C; --roja-b:#FF7A52; --trade:#37B6AA; --trade-b:#4FD8CA;
+    --arena:#D8B583; --verde:#22B14C; --line:rgba(237,242,240,0.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background-color:var(--navy);
+    background-image:linear-gradient(rgba(237,242,240,.05) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(237,242,240,.05) 1px,transparent 1px);
+    background-size:42px 42px;
+    color:var(--foam);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--trade-b)}
+  .wrap{max-width:1180px;margin:0 auto}
+
+  header{padding:26px 20px 18px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--trade);margin:0 0 8px}
+  h1{font-family:'Big Shoulders Display',Impact,sans-serif;font-weight:800;
+    font-size:clamp(30px,7vw,48px);line-height:.95;letter-spacing:.01em;
+    margin:0 0 10px;text-transform:uppercase}
+  h1 span{color:var(--roja)}
+  .sub{max-width:660px;font-size:14.5px;line-height:1.55;color:var(--dim);margin:0}
+
+  /* ---- veredicto ---- */
+  .verdict{padding:20px;border-bottom:1px solid var(--line)}
+  .verdict-card{background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:20px 22px}
+  .verdict-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--dim2);margin:0 0 6px}
+  .verdict-name{font-family:'Big Shoulders Display',Impact,sans-serif;font-weight:800;
+    font-size:clamp(26px,5.5vw,40px);line-height:1;text-transform:uppercase;
+    color:var(--trade-b);margin:0 0 10px}
+  .verdict-note{font-size:13.5px;line-height:1.6;color:#CBD6D3;margin:0}
+
+  /* ---- barras de exposición ---- */
+  .bars{padding:0 20px 20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px}
+  h2{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--dim);margin:0 0 14px;font-weight:700}
+  .bar-row{padding:10px 0;border-top:1px solid var(--line)}
+  .bar-row:first-of-type{border-top:none}
+  .bar-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .bar-name{font-family:'Space Mono',monospace;font-size:12px;text-transform:uppercase;
+    letter-spacing:.04em;min-width:158px}
+  .bar-track{flex:1;min-width:120px;height:12px;background:rgba(237,242,240,.07);
+    border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .bar-fill{height:100%;width:0;transition:width .7s ease}
+  .bar-num{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
+    min-width:56px;text-align:right}
+
+  /* ---- instrumentos ---- */
+  .instr{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+    margin-top:14px}
+  .metric{background:rgba(237,242,240,.04);border:1px solid var(--line);border-radius:5px;
+    padding:12px 14px}
+  .metric .k{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--dim2);margin-bottom:5px}
+  .metric .v{font-family:'Space Mono',monospace;font-size:19px;font-weight:700}
+  .metric .u{font-size:12px;color:var(--dim);font-weight:400}
+
+  main{padding:0 20px}
+  #map{height:66vh;min-height:420px;border-radius:6px;border:1px solid var(--line);
+    background:#0d2230}
+
+  /* ---- firma: la regla de precisión ---- */
+  .ruler{padding:20px}
+  .ruler-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .ruler-head h2{margin:0}
+  .ruler-svg{width:100%;height:auto;display:block}
+  .ruler-note{font-size:13px;line-height:1.65;color:#CBD6D3;margin:14px 0 0}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px 20px}
+  @media(max-width:760px){.cols{grid-template-columns:1fr}}
+  .legend-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px}
+  .dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;border:1.5px solid #0A1B26}
+  .fine{font-size:11.5px;color:var(--dim2);line-height:1.6;margin-top:10px}
+  .btn{display:inline-block;font-family:'Space Mono',monospace;font-size:12px;
+    padding:8px 12px;border:1px solid rgba(79,216,202,.5);border-radius:4px;
+    color:var(--trade-b);text-decoration:none;margin:0 8px 8px 0}
+  .btn:hover{background:rgba(79,216,202,.12)}
+
+  .warn{background:rgba(196,62,28,.14);border:1px solid rgba(255,122,82,.42);
+    border-radius:6px;padding:14px 16px;margin:0 20px 20px;font-size:13.5px;line-height:1.6}
+  .warn b{color:var(--roja-b)}
+  .hidden{display:none!important}
+
+  footer{padding:20px 20px 46px;font-size:12.5px;line-height:1.75;color:var(--dim2);
+    border-top:1px solid var(--line)}
+  footer strong{color:var(--dim)}
+
+  .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--foam)}
+  .leaflet-popup-content{font-size:13px;line-height:1.5}
+  .leaflet-bar a{background:var(--panel)!important;color:var(--foam)!important;
+    border-bottom:1px solid var(--line)!important}
+  .leaflet-control-attribution{background:rgba(10,27,38,.82)!important;color:var(--dim2)!important}
+  .leaflet-control-attribution a{color:var(--dim)!important}
+  .pin{background:transparent;border:none}
+  @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+  :focus-visible{outline:2px solid var(--trade-b);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">28.03° N · 16.54° O · Granadilla de Abona, Tenerife</p>
+  <h1>El Médano <span>·</span> Costa</h1>
+  <p class="sub">Dónde llegarían los vertidos al mar en las próximas tres horas, según las condiciones de viento y corriente del momento. Lo calcula una red entrenada sobre 500 simulaciones físicas de deriva de partículas.</p>
+</header>
+
+<div class="warn" id="aviso-carga">
+  <b>Cargando la predicción…</b> Si este mensaje no desaparece, es que aún no se ha
+  publicado ninguna predicción o falló la última actualización automática.
+</div>
+
+<section class="verdict hidden" id="sec-verdict">
+  <div class="verdict-card">
+    <p class="verdict-label">Menor exposición estimada ahora</p>
+    <p class="verdict-name" id="verdict-name">—</p>
+    <p class="verdict-note" id="verdict-note"></p>
+  </div>
+</section>
+
+<section class="bars hidden" id="sec-bars">
+  <div class="card">
+    <h2>Exposición relativa entre estas cuatro playas</h2>
+    <div id="bar-list"></div>
+    <div class="instr">
+      <div class="metric"><div class="k">Viento</div>
+        <div class="v" id="m-viento">—<span class="u"> m/s</span></div></div>
+      <div class="metric"><div class="k">Viene de</div>
+        <div class="v" id="m-dir">—</div></div>
+      <div class="metric"><div class="k">Corriente</div>
+        <div class="v" id="m-corr">—<span class="u"> m/s</span></div></div>
+      <div class="metric"><div class="k">Calculado</div>
+        <div class="v" id="m-hora">—<span class="u"> UTC</span></div></div>
+    </div>
+    <p class="fine">100 es la más expuesta de las cuatro en este momento y 0 la menos.
+    No es una medida de contaminación: es una comparación entre ellas.</p>
+  </div>
+</section>
+
+<main><div id="map"></div></main>
+
+<section class="ruler hidden" id="sec-ruler">
+  <div class="card">
+    <div class="ruler-head">
+      <h2>Cuánto se equivoca</h2>
+    </div>
+    <svg class="ruler-svg" viewBox="0 0 900 132" role="img"
+         aria-label="Regla que compara el error del modelo con distancias reconocibles de la costa">
+      <defs>
+        <linearGradient id="gErr" x1="0" x2="1">
+          <stop offset="0%" stop-color="#37B6AA"/><stop offset="100%" stop-color="#C43E1C"/>
+        </linearGradient>
+      </defs>
+      <line x1="40" y1="86" x2="860" y2="86" stroke="#A9BAC0" stroke-width="1.5"/>
+      <g font-family="Space Mono, monospace" font-size="11" fill="#7C8D93" text-anchor="middle">
+        <line x1="40"  y1="80" x2="40"  y2="92" stroke="#7C8D93"/><text x="40"  y="110">0</text>
+        <line x1="345" y1="80" x2="345" y2="92" stroke="#7C8D93"/><text x="345" y="110">350 m</text>
+        <line x1="610" y1="80" x2="610" y2="92" stroke="#7C8D93"/><text x="610" y="110">1 km</text>
+        <line x1="860" y1="80" x2="860" y2="92" stroke="#7C8D93"/><text x="860" y="110">2 km</text>
+      </g>
+      <rect x="40" y="46" width="305" height="22" fill="url(#gErr)" opacity=".85" rx="2"/>
+      <rect x="345" y="46" width="265" height="22" fill="#C43E1C" opacity=".28" rx="2"/>
+      <text x="46" y="38" font-family="Inter, sans-serif" font-size="12.5" font-weight="700" fill="#4FD8CA">
+        error habitual · 350 m</text>
+      <text x="352" y="38" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#FF7A52">
+        1 de cada 10 veces llega a 996 m</text>
+      <g font-family="Inter, sans-serif" font-size="11.5" fill="#A9BAC0">
+        <line x1="40" y1="124" x2="345" y2="124" stroke="#A9BAC0" stroke-width="1"/>
+        <text x="352" y="128">ancho de la bahía de El Médano</text>
+      </g>
+    </svg>
+    <p class="ruler-note">Comparado con 75 simulaciones físicas que la red nunca vio,
+    el centro de la pluma predicha cae a unos <b>350 metros</b> de donde lo pone la
+    simulación. Una de cada diez veces, a casi un kilómetro. Eso basta para elegir
+    playa, no para elegir en qué punto de la arena ponerse.</p>
+  </div>
+</section>
+
+<section class="cols hidden" id="sec-cols">
+  <div class="card">
+    <h2>Leyenda</h2>
+    <div class="legend-row"><span class="dot" style="background:#FF7A52"></span> vertido no autorizado</div>
+    <div class="legend-row"><span class="dot" style="background:#D8B583"></span> vertido en trámite</div>
+    <div class="legend-row"><span class="dot" style="background:#22B14C"></span> vertido autorizado</div>
+    <div class="legend-row"><span class="dot" style="background:#4FD8CA;border-radius:2px"></span> playa vigilada</div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
+    <div class="legend-row"><span style="width:70px;height:11px;border-radius:2px;background:linear-gradient(90deg,#2fd0c0,#a8e832,#f5c518,#e8500d)"></span> densidad estimada</div>
+    <p class="fine">Los emisarios se dibujan en el punto que usó la simulación, desplazado
+    unos cientos de metros mar adentro respecto a su coordenada del censo para que las
+    partículas no naciesen en tierra. Toca cualquiera para ver su ficha.</p>
+  </div>
+  <div class="card">
+    <h2>El dato que manda</h2>
+    <p style="font-size:13.5px;line-height:1.6;color:#CBD6D3;margin:0 0 12px">
+      El Ayuntamiento de Granadilla de Abona analiza el agua de diez playas dos veces
+      por semana. Eso es una medida; esto de aquí es una estimación. Ante la duda, y
+      siempre antes de bañarte, la bandera de la playa y las analíticas mandan.</p>
+    <a class="btn" href="https://www.granadilladeabona.org/" target="_blank" rel="noopener">Analíticas del Ayuntamiento ↗</a>
+    <a class="btn" href="https://opendata.sitcan.es/dataset/actualizacion-del-censo-de-vertidos-desde-tierra-al-mar-ano-2025" target="_blank" rel="noopener">Censo oficial 2025 ↗</a>
+    <a class="btn" href="http://visor.grafcan.es/visorweb/default.php?svc=svcVertidos" target="_blank" rel="noopener">Visor GRAFCAN ↗</a>
+  </div>
+</section>
+
+<footer>
+  <strong>Cómo se calcula.</strong> Cada hora, un proceso automático descarga el viento
+  (Open-Meteo) y la corriente superficial (Copernicus Marine) de la zona, y se los pasa a
+  una red neuronal que aprendió a imitar a <em>OpenDrift</em>, un simulador de deriva de
+  partículas. Esa red se entrenó con 500 simulaciones lanzadas desde los diez puntos de
+  vertido activos del censo oficial de Canarias, ponderados según lo que vierten: el agua
+  residual urbana pesa cuatro veces más que la salmuera o el agua de refrigeración, un
+  criterio sanitario que es una decisión nuestra y no un dato.<br><br>
+  <strong>Qué no es.</strong> No mide contaminación: estima transporte. La posición de la
+  señal a lo largo de la costa es la parte fiable; su extensión mar adentro se exagera,
+  algo comprobado comparando la red con la simulación física. La corriente disponible
+  tiene una resolución de dos o tres kilómetros sobre una bahía que mide uno. Y no se
+  conocen los caudales reales de cada emisario.<br><br>
+  <strong>Fuentes.</strong> Censo de vertidos tierra-mar 2025, Gobierno de Canarias
+  (SITCAN Open Data) · Copernicus Marine Service, producto IBI · Open-Meteo ·
+  OpenStreetMap (línea de costa) · Esri World Imagery (satélite) ·
+  Ayuntamiento de Granadilla de Abona (analíticas).
+  <span id="pie-modelo"></span>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function(){
+  "use strict";
+  var COLOR = {
+    "no autorizado":"#FF7A52", "en tramite":"#D8B583", "autorizado":"#22B14C"
+  };
+  function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function clave(t){
+    return String(t||"").toLowerCase()
+      .replace(/á/g,"a").replace(/é/g,"e").replace(/í/g,"i")
+      .replace(/ó/g,"o").replace(/ú/g,"u").trim();
+  }
+
+  var map = L.map("map",{zoomControl:false});
+  L.control.zoom({position:"bottomright"}).addTo(map);
+  var sat = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {attribution:"Imagen: Esri World Imagery", maxZoom:19}).addTo(map);
+  var calle = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {attribution:"&copy; OpenStreetMap", maxZoom:19});
+  L.control.layers({"Satélite":sat,"Callejero":calle},null,{position:"topright"}).addTo(map);
+  map.setView([28.045,-16.535], 12);
+
+  var PLAYAS = {
+    "El Médano centro":[28.0435,-16.5382], "El Cabezo":[28.0457,-16.5333],
+    "Leocadio Machado":[28.0378,-16.5425], "La Tejita":[28.0313,-16.5536]
+  };
+
+  function pin(color, cuadrado){
+    return L.divIcon({className:"pin", iconSize:[16,16], iconAnchor:[8,8], popupAnchor:[0,-9],
+      html:'<span style="display:block;width:13px;height:13px;background:'+color+
+           ';border:2px solid #EDF2F0;border-radius:'+(cuadrado?"3px":"50%")+
+           ';box-shadow:0 1px 4px rgba(0,0,0,.55)"></span>'});
+  }
+
+  function mostrar(d){
+    document.getElementById("aviso-carga").classList.add("hidden");
+    ["sec-verdict","sec-bars","sec-ruler","sec-cols"].forEach(function(id){
+      document.getElementById(id).classList.remove("hidden");
+    });
+
+    // --- overlay de la pluma, georreferenciado con los límites del modelo ---
+    var b = d.limites;
+    L.imageOverlay("pluma.png?t="+Date.now(),
+      [[b.lat_min,b.lon_min],[b.lat_max,b.lon_max]], {opacity:1, interactive:false}).addTo(map);
+
+    // --- emisarios ---
+    var grupo = [];
+    (d.focos||[]).forEach(function(f){
+      var c = COLOR[clave(f.estado)] || "#A9BAC0";
+      L.marker([f.lat,f.lon],{icon:pin(c,false)}).addTo(map).bindPopup(
+        "<strong>"+esc(f.nombre)+"</strong><br>"+
+        '<span style="color:'+c+';font-family:\'Space Mono\',monospace;font-size:11px">'+
+        esc(String(f.estado).toUpperCase())+"</span><br>"+esc(f.naturaleza)+
+        "<br><span style='color:#7C8D93;font-size:11px'>peso "+f.peso+
+        " · desplazado "+Math.round(f.desplazado_m)+" m mar adentro</span>");
+      grupo.push([f.lat,f.lon]);
+    });
+    Object.keys(PLAYAS).forEach(function(n){
+      L.marker(PLAYAS[n],{icon:pin("#4FD8CA",true)}).addTo(map).bindPopup("<strong>"+esc(n)+"</strong>");
+      grupo.push(PLAYAS[n]);
+    });
+    if (grupo.length) map.fitBounds(L.latLngBounds(grupo).pad(0.25));
+
+    // --- veredicto y barras ---
+    var exp = d.exposicion_playas || {};
+    var orden = Object.keys(exp).sort(function(a,c){return exp[a]-exp[c];});
+    document.getElementById("verdict-name").textContent = d.menor_exposicion || orden[0] || "—";
+    var peor = orden[orden.length-1];
+    document.getElementById("verdict-note").textContent =
+      "De las cuatro playas vigiladas, es la que menos señal recibe con el viento y la " +
+      "corriente de ahora. La más expuesta sería " + peor + ". Recuerda que la diferencia " +
+      "es relativa entre ellas, no una medida de si el agua está limpia.";
+
+    var cont = document.getElementById("bar-list");
+    cont.innerHTML = "";
+    orden.slice().reverse().forEach(function(n){
+      var v = exp[n];
+      var col = v >= 67 ? "#FF7A52" : (v >= 34 ? "#D8B583" : "#37B6AA");
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML = '<div class="bar-top"><span class="bar-name">'+esc(n)+'</span>'+
+        '<div class="bar-track"><div class="bar-fill" style="background:'+col+'"></div></div>'+
+        '<span class="bar-num" style="color:'+col+'">'+v+'</span></div>';
+      cont.appendChild(row);
+      requestAnimationFrame(function(){ row.querySelector(".bar-fill").style.width = v+"%"; });
+    });
+
+    // --- instrumentos ---
+    var w = d.viento_resumen || {};
+    var c = d.condiciones || {};
+    var modCorr = Math.hypot(c.corriente_u||0, c.corriente_v||0);
+    document.getElementById("m-viento").innerHTML = (w.velocidad_ms!=null?w.velocidad_ms:"—")+'<span class="u"> m/s</span>';
+    document.getElementById("m-dir").textContent = (w.desde_grados!=null?w.desde_grados+"°":"—");
+    document.getElementById("m-corr").innerHTML = modCorr.toFixed(2)+'<span class="u"> m/s</span>';
+    document.getElementById("m-hora").innerHTML =
+      String(d.instante_utc||"").slice(11,16)+'<span class="u"> UTC</span>';
+
+    document.getElementById("pie-modelo").innerHTML =
+      "<br><br>Modelo <em>"+esc(d.modelo||"")+"</em> · predicción generada "+
+      esc(String(d.generado_utc||"").replace("T"," "))+" UTC.";
+
+    // --- fuera del rango de entrenamiento: hay que decirlo, no esconderlo ---
+    if ((d.fuera_de_rango||[]).length){
+      var a = document.getElementById("aviso-carga");
+      a.innerHTML = "<b>Condiciones inusuales.</b> Hoy " + d.fuera_de_rango.join(", ") +
+        " se sale del rango que el modelo vio al entrenar, así que está extrapolando. " +
+        "Tómate esta predicción con más reservas de lo habitual.";
+      a.classList.remove("hidden");
+    }
+  }
+
+  fetch("prediccion.json?t="+Date.now(), {cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(mostrar)
+    .catch(function(e){
+      document.getElementById("aviso-carga").innerHTML =
+        "<b>No hay predicción disponible.</b> La actualización automática no ha publicado " +
+        "datos todavía, o ha fallado. El mapa sigue navegable, pero sin pluma estimada. " +
+        "<span style='color:#7C8D93'>(" + esc(e.message) + ")</span>";
+    });
+})();
+</script>
+</body>
+</html>
