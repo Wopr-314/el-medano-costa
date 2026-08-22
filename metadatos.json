@@ -1,0 +1,147 @@
+{
+  "modelo": "emulador_unet_continuo_5h_334m.pt",
+  "linea_costa": "osm",
+  "rejilla": {
+    "nx": 256,
+    "ny": 176,
+    "celda_m": 100,
+    "lon_min": -16.65746139994758,
+    "lat_min": 27.9909610748291,
+    "delta_lon": 0.001020665084297434,
+    "delta_lat": 0.0009002685546875
+  },
+  "normalizacion": {
+    "nombres": [
+      "viento_u",
+      "viento_v",
+      "corriente_u",
+      "corriente_v",
+      "corriente_u_std",
+      "corriente_v_std",
+      "ssh_media"
+    ],
+    "media": [
+      -0.46322572231292725,
+      -0.8434553146362305,
+      -0.05472110956907272,
+      -0.012343871407210827,
+      0.06628793478012085,
+      0.06910263746976852,
+      -0.19452473521232605
+    ],
+    "desviacion": [
+      2.466496467590332,
+      0.9743582606315613,
+      0.12896379828453064,
+      0.09654328227043152,
+      0.02529541775584221,
+      0.027447057887911797,
+      0.37156209349632263
+    ],
+    "escala_salida": 6.722630023956299
+  },
+  "focos": [
+    {
+      "nombre": "Emisario Submarino de La Batata - Ensenada Pelada",
+      "lat": 28.05522,
+      "lon": -16.519595,
+      "estado": "En Trámite",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Central Térmica de Granadilla (I)",
+      "lat": 28.082667,
+      "lon": -16.488271,
+      "estado": "Autorizado",
+      "naturaleza": "Agua residual industrial",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Central Térmica de Granadilla (II)",
+      "lat": 28.0823,
+      "lon": -16.488775,
+      "estado": "Autorizado",
+      "naturaleza": "Refrigeración",
+      "peso": 0.2,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "EDAM Granadilla",
+      "lat": 28.08794,
+      "lon": -16.489738,
+      "estado": "Autorizado",
+      "naturaleza": "Salmuera",
+      "peso": 0.25,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Conducción de desagüe del Polígono Industrial de Granadilla",
+      "lat": 28.077049,
+      "lon": -16.485335,
+      "estado": "Autorizado",
+      "naturaleza": "Agua residual industrial",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Emisario submarino El Médano",
+      "lat": 28.041512,
+      "lon": -16.533277,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Emisario submarino Los Abrigos",
+      "lat": 28.022789,
+      "lon": -16.587679,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 0.0
+    },
+    {
+      "nombre": "Aliviadero EBAR Los Abrigos",
+      "lat": 28.028261,
+      "lon": -16.593608,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 100.0
+    },
+    {
+      "nombre": "EBAR Beach I",
+      "lat": 28.051523,
+      "lon": -16.524417,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 50.0
+    },
+    {
+      "nombre": "EBAR Los Balos",
+      "lat": 28.041363,
+      "lon": -16.541001,
+      "estado": "No autorizado",
+      "naturaleza": "Agua residual urbana",
+      "peso": 1.0,
+      "desplazado_m": 150.0
+    }
+  ],
+  "precision": {
+    "desvio_centro_mediana_m": 350,
+    "desvio_centro_p90_m": 996,
+    "correlacion": 0.735,
+    "error_masa_mediana": 0.078,
+    "muestras_validacion": 75
+  },
+  "avisos": [
+    "Estimación orientativa, no una medida de contaminación.",
+    "La posición de la señal a lo largo de la costa es fiable; su extensión mar adentro se exagera (comprobado contra la simulación física).",
+    "Las analíticas municipales del Ayuntamiento de Granadilla de Abona y la bandera de la playa mandan siempre sobre cualquier salida de este modelo."
+  ]
+}
