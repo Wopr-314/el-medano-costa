@@ -1,20 +1,20 @@
 {
-  "generado_utc": "2026-08-22T03:42:06",
-  "instante_utc": "2026-08-22T03:00:00",
+  "generado_utc": "2026-08-22T04:32:38",
+  "instante_utc": "2026-08-22T04:00:00",
   "horas": 3,
   "modelo": "emulador_unet_osm_350m.pt",
   "condiciones": {
-    "viento_u": -0.3862,
-    "viento_v": -0.0614,
-    "corriente_u": -0.4068,
-    "corriente_v": -0.4096,
-    "corriente_u_std": 0.0491,
-    "corriente_v_std": 0.0435,
-    "ssh_media": -0.1864
+    "viento_u": -0.3477,
+    "viento_v": -0.0737,
+    "corriente_u": -0.3994,
+    "corriente_v": -0.3957,
+    "corriente_u_std": 0.0479,
+    "corriente_v_std": 0.0449,
+    "ssh_media": -0.0981
   },
   "viento_resumen": {
     "velocidad_ms": 0.4,
-    "desde_grados": 82
+    "desde_grados": 80
   },
   "fuera_de_rango": [
     "corriente_v"
