@@ -29,7 +29,7 @@ import os
 import sys
 import numpy as np
 
-DUR_H = 3                    # misma ventana con la que se entreno
+DUR_H = 5                    # misma ventana con la que se entreno
 PLAYAS = {
     "El Médano centro": (28.0435, -16.5382),
     "El Cabezo":        (28.0457, -16.5333),
