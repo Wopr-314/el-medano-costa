@@ -1,27 +1,27 @@
 {
-  "generado_utc": "2026-08-21T23:24:12",
-  "instante_utc": "2026-08-21T23:00:00",
+  "generado_utc": "2026-08-22T01:13:34",
+  "instante_utc": "2026-08-22T01:00:00",
   "horas": 3,
   "modelo": "emulador_unet_osm_350m.pt",
   "condiciones": {
-    "viento_u": -0.9857,
-    "viento_v": -0.4122,
-    "corriente_u": -0.4303,
-    "corriente_v": -0.424,
-    "corriente_u_std": 0.0604,
-    "corriente_v_std": 0.0432,
-    "ssh_media": -0.2826
+    "viento_u": -0.6257,
+    "viento_v": -0.2354,
+    "corriente_u": -0.4222,
+    "corriente_v": -0.4255,
+    "corriente_u_std": 0.0541,
+    "corriente_v_std": 0.0424,
+    "ssh_media": -0.3005
   },
   "viento_resumen": {
-    "velocidad_ms": 1.1,
-    "desde_grados": 66
+    "velocidad_ms": 0.7,
+    "desde_grados": 72
   },
   "fuera_de_rango": [
     "corriente_v"
   ],
   "exposicion_playas": {
-    "El Médano centro": 81,
-    "El Cabezo": 32,
+    "El Médano centro": 79,
+    "El Cabezo": 34,
     "Leocadio Machado": 100,
     "La Tejita": 0
   },
