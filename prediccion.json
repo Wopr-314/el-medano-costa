@@ -1,20 +1,20 @@
 {
-  "generado_utc": "2026-08-23T09:28:28",
-  "instante_utc": "2026-08-23T09:00:00",
+  "generado_utc": "2026-08-23T10:24:13",
+  "instante_utc": "2026-08-23T10:00:00",
   "horas": 5,
   "modelo": "emulador_unet_continuo_5h_334m.pt",
   "condiciones": {
-    "viento_u": -1.4482,
-    "viento_v": 1.5626,
-    "corriente_u": -0.3137,
-    "corriente_v": -0.3511,
-    "corriente_u_std": 0.0955,
-    "corriente_v_std": 0.1114,
-    "ssh_media": 0.017
+    "viento_u": -1.4793,
+    "viento_v": 1.9232,
+    "corriente_u": -0.3365,
+    "corriente_v": -0.3872,
+    "corriente_u_std": 0.1019,
+    "corriente_v_std": 0.1155,
+    "ssh_media": -0.0829
   },
   "viento_resumen": {
-    "velocidad_ms": 2.2,
-    "desde_grados": 130
+    "velocidad_ms": 2.5,
+    "desde_grados": 139
   },
   "fuera_de_rango": [
     "corriente_v"
