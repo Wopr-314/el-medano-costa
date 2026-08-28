@@ -4,7 +4,7 @@ name: Predicción horaria
 # mucha carga; para una ventana de 3 h es irrelevante.
 on:
   schedule:
-    - cron: "5 * * * *"
+    - cron: "23 * * * *"
   workflow_dispatch:        # permite lanzarla a mano desde la pestaña Actions
 
 # Necesario para que la Action pueda escribir el resultado en el repositorio.
