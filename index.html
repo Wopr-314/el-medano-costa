@@ -281,9 +281,30 @@
 
   function mostrar(d){
     document.getElementById("aviso-carga").classList.add("hidden");
-    ["sec-verdict","sec-bars","sec-ruler","sec-cols"].forEach(function(id){
-      document.getElementById(id).classList.remove("hidden");
-    });
+    // Los cron de GitHub Actions son de "mejor esfuerzo": en horas punta se
+    // saltan ejecuciones sin avisar, y la predicción puede quedarse horas
+    // vieja. Sin este aviso, quien entre ve un mapa que parece actual.
+    function _parseUTC(s){
+      if (!s) return NaN;
+      var t = String(s).trim();
+      // Si no trae zona horaria, se asume UTC. Añadir "Z" a una fecha que ya
+      // la tiene devuelve NaN, y NaN>2 es falso: el aviso no saltaría nunca.
+      if (!/[Zz]$|[+-]\d{2}:?\d{2}$/.test(t)) t += "Z";
+      return Date.parse(t);
+    }
+    var _ms = _parseUTC(d.instante_utc);
+    var edadH = isNaN(_ms) ? -1 : (Date.now() - _ms) / 3600000;
+    if (edadH > 2) {
+      var av = document.getElementById("aviso-carga");
+      var cuando = edadH < 24
+        ? "hace " + Math.round(edadH) + " horas"
+        : "hace " + Math.round(edadH / 24) + " día" + (edadH >= 48 ? "s" : "");
+      av.innerHTML = "<b>Predicción desactualizada.</b> Se calculó " + cuando +
+        ", no ahora. La actualización automática se ejecuta cada hora, pero a " +
+        "veces se retrasa. El viento y la corriente habrán cambiado, así que " +
+        "<b>este mapa ya no describe la situación actual</b>.";
+      av.classList.remove("hidden");
+    }
 
     // --- overlay de la pluma, georreferenciado con los límites del modelo ---
     var b = d.limites;
@@ -348,11 +369,17 @@
 
     // --- fuera del rango de entrenamiento: hay que decirlo, no esconderlo ---
     if ((d.fuera_de_rango||[]).length){
-      var a = document.getElementById("aviso-carga");
-      a.innerHTML = "<b>Condiciones inusuales.</b> Hoy " + d.fuera_de_rango.join(", ") +
-        " se sale del rango que el modelo vio al entrenar, así que está extrapolando. " +
-        "Tómate esta predicción con más reservas de lo habitual.";
-      a.classList.remove("hidden");
+      var av2 = document.getElementById("aviso-carga");
+      var vs = d.fuera_de_rango;
+      var frase = "<b>Condiciones inusuales.</b> Hoy " + vs.join(", ") +
+        (vs.length > 1 ? " se salen" : " se sale") + " del rango que el modelo " +
+        "vio al entrenar, así que está extrapolando. Tómate esta predicción " +
+        "con más reservas de lo habitual.";
+      // Si ya hay aviso de antigüedad, se AÑADE en vez de reemplazarlo: son
+      // dos problemas distintos y conviene conocer los dos.
+      av2.innerHTML = av2.classList.contains("hidden")
+        ? frase : av2.innerHTML + "<br><br>" + frase;
+      av2.classList.remove("hidden");
     }
   }
 
