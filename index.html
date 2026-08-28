@@ -281,6 +281,10 @@
 
   function mostrar(d){
     document.getElementById("aviso-carga").classList.add("hidden");
+    ["sec-verdict","sec-bars","sec-ruler","sec-cols"].forEach(function(id){
+    document.getElementById(id).classList.remove("hidden");
+    });
+    
     // Los cron de GitHub Actions son de "mejor esfuerzo": en horas punta se
     // saltan ejecuciones sin avisar, y la predicción puede quedarse horas
     // vieja. Sin este aviso, quien entre ve un mapa que parece actual.
